@@ -3,10 +3,10 @@ import tkinter as tk
 from typing import List, Tuple
 from math import floor
 
-from tkinter_scattered_graphs.errors import InvalidDatasetError
-from tkinter_scattered_graphs.two_dimensions_scattered_plot import TwoDimensionsScatteredPlot
-from tkinter_scattered_graphs.canvas_utils import text
-from tkinter_scattered_graphs.constants import *
+from tk_scattered_graphs.errors import InvalidDatasetError
+from tk_scattered_graphs.two_dimensions_scattered_plot import TwoDimensionsScatteredPlot
+from tk_scattered_graphs.canvas_utils import text
+from tk_scattered_graphs.constants import *
 
 EXTERIOR_MARGIN_PX = MED_SPACE_PX
 TAG_SPACE_PX = MED_SPACE_PX
@@ -15,7 +15,6 @@ TITLE_SPACE_PX = MED_SPACE_PX + 5
 DESCRIPTION_SPACE_PX = TAG_SPACE_PX
 DESCRIPTION_LOWER_MARGIN_PX = MIN_SPACE_PX
 HEADER_SPACE_PX = TITLE_SPACE_PX + DESCRIPTION_SPACE_PX + DESCRIPTION_LOWER_MARGIN_PX
-
 
 
 """
@@ -40,6 +39,8 @@ class MultidimensionalCorrelatedScatteredPlot:
                  title: str = "my n-dimension correlated plot",
                  description: str = "this plot can have n > 1 variables; it uses a correlated plot system to visualize the multiple dimensions",
                  annotated_dots=False):
+        """ initialise a multidimensional plot, composed of two dimensional plots """
+
         if len(data) == 0 or len(data[0]) <= 1:  # at least one point, at least 2 dimensions
             raise InvalidDatasetError
 
@@ -61,7 +62,7 @@ class MultidimensionalCorrelatedScatteredPlot:
         for variable_x in range(variable_count):  # plot each variable in the x row
             for variable_y in range(variable_count):  # plot the column
                 dataset_to_plot = self._get_dataset_for_variables(variable_x, variable_y)
-                x0, y0 = self._get_plot_coordinates(variable_x, variable_y, plot_width, plot_height)
+                x0, y0 = self._get_plots_coordinates(variable_x, variable_y, plot_width, plot_height)
                 TwoDimensionsScatteredPlot(dataset_to_plot, self.canvas, x0, y0, plot_width, plot_height,
                                            annotated_dots=annotated_dots)
 
@@ -94,7 +95,8 @@ class MultidimensionalCorrelatedScatteredPlot:
 
         return plot_width, plot_height
 
-    def _get_plot_coordinates(self, variable_x, variable_y, plot_width, plot_height) -> Tuple[int, int]:
+    def _get_plots_coordinates(self, variable_x, variable_y, plot_width, plot_height) -> Tuple[int, int]:
+        """ get x0, y0 coordinates of the plots reserved space """
         x0 = EXTERIOR_MARGIN_PX + TAG_SPACE_PX  # padding and var labels
         if variable_x != 0:  # add the space of each plot to its left and interior margin
             x0 += (plot_width + INTERIOR_MARGIN_PX) * variable_x
@@ -107,22 +109,27 @@ class MultidimensionalCorrelatedScatteredPlot:
 
     @staticmethod
     def _get_title_coordinates():
+        """ get coordinates of the title reserved space (all space minus margin reserved space) """
         return EXTERIOR_MARGIN_PX, EXTERIOR_MARGIN_PX
 
     def _set_title(self, title: str) -> None:
+        """ set the plot title text at the appropriate place """
         x0, y0 = self._get_title_coordinates()
         text(self.canvas, x0, y0, fill=TEXT_COLOR, font=H1_FONT, text=title)
 
     @staticmethod
     def _get_description_coordinates():
+        """ get the coordinates of the description reserved space (below the title) """
         return EXTERIOR_MARGIN_PX, EXTERIOR_MARGIN_PX + TITLE_SPACE_PX
 
     def _set_description(self, description: str) -> None:
+        """ set the plot description text at the appropriate place """
         x0, y0 = self._get_description_coordinates()
         text(self.canvas, x0, y0, fill=TEXT_COLOR, font=P_FONT, text=description)
 
     def _set_variable_tags(self, variable_count: int, plot_width: int, plot_height: int) -> None:
         """ write variable tags for each variable, in the x and y axis """
+
         def get_variable_tags_y_axis_x0_coordinate():
             return EXTERIOR_MARGIN_PX
 
@@ -157,9 +164,11 @@ class MultidimensionalCorrelatedScatteredPlot:
             text(self.canvas, x0, y0, fill=TEXT_COLOR, font=P_FONT, text=tag, angle=90)
 
     def _get_variable_count(self) -> int:
+        """ get the number of variables of the given dataset """
         return len(self.data[0])  # get the number of variables from the first point
 
     def _get_dataset_for_variables(self, variable_x: int, variable_y: int) -> List[tuple]:
+        """ get the 2 dimensional dataset for any given two variables """
         # get for each point, a new point with the desired variables
         return [(point[variable_x], point[variable_y]) for point in self.data]
 

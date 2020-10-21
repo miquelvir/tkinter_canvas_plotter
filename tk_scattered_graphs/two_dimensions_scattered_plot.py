@@ -2,8 +2,8 @@ import tkinter as tk
 
 from typing import Tuple, List
 
-from tkinter_scattered_graphs.canvas_utils import dot, rectangle, tag_dot, text
-from tkinter_scattered_graphs.constants import MED_SPACE_PX
+from tk_scattered_graphs.canvas_utils import dot, rectangle, tag_dot, text
+from tk_scattered_graphs.constants import MED_SPACE_PX
 
 OUTLINE_COLOR = "black"
 AXIS_SPACE_PX = MED_SPACE_PX
@@ -12,6 +12,8 @@ DOT_RADIUS_PX = 3
 
 class TwoDimensionsScatteredPlot:
     def __init__(self, data: List[Tuple[float, float]], canvas: tk.Canvas, x0, y0, plot_width, plot_height, annotated_dots=False):
+        """ initialise a two dimensional scattered plot """
+
         self._data: List[Tuple[float, float]] = data
         self._canvas = canvas
         self._x0, self._y0 = x0, y0
@@ -33,9 +35,10 @@ class TwoDimensionsScatteredPlot:
         # write the reference measures
         self._set_measure_indications()
 
-    def _plot_points(self, annotated_dots):
+    def _plot_points(self, tags: bool = False):
+        """ for each point in self._data, plot it (with a tag if tags) """
         for point in self._data:
-            if annotated_dots:
+            if tags:
                 tag_dot(self._canvas, *self._get_px(point), tag=str(point), radius=DOT_RADIUS_PX)
             else:
                 dot(self._canvas, *self._get_px(point), radius=DOT_RADIUS_PX)
@@ -66,20 +69,26 @@ class TwoDimensionsScatteredPlot:
         return x, y
 
     def _get_data_boundaries(self) -> Tuple[float, float, float, float]:
+        """ get min and max x and y """
         max_x, max_y = tuple(map(max, zip(*self._data)))
         min_x, min_y = tuple(map(min, zip(*self._data)))
         return min_x, min_y, max_x, max_y
 
     def _get_plot_dimensions(self) -> Tuple[int, int]:
+        """ get usable plot size (total size - axis reserved space) """
         return self._width - AXIS_SPACE_PX, self._height - AXIS_SPACE_PX
 
     def _get_plot_coordinates(self) -> Tuple[int, int]:
-        return self._x0 + AXIS_SPACE_PX, self._y0
+        """ get x0, y0 coordinates of the plot space """
+        return self._x0 + AXIS_SPACE_PX, self._y0  # y does not need to be added AXIS_SPACE_PX, since it is at bottom
 
     def _set_frame(self):
+        """ draw a frame for the plot space (excluding the axis reserved space) """
         rectangle(self._canvas, self._plot_x0, self._plot_y0, self._plot_width, self._plot_height, outline=OUTLINE_COLOR)
 
     def _set_measure_indications(self):
+        """ adds min and max measures in the axis """
+
         # x axis
         text(self._canvas, self._plot_x0, self._plot_y0 + self._plot_height, text=str(self._min_x))
         text(self._canvas, self._plot_x0 + self._plot_width, self._plot_y0 + self._plot_height, text=str(self._max_x), anchor="ne")

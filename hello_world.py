@@ -1,10 +1,8 @@
 import tkinter as tk
-from tkinter_scattered_graphs.multidimensional_correlated_scattered_plot import MultidimensionalCorrelatedScatteredPlot
-from tkinter_scattered_graphs.errors import InvalidDatasetError
-
+from tk_scattered_graphs import MultidimensionalCorrelatedScatteredPlot, InvalidDatasetError
 
 """
-This is boilerplate code for the use of tkinter_scattered_graphs package. 
+This is boilerplate code for the use of tk_scattered_graphs package. 
 A straight-forward hello-world like code to get a glance of how to use the package.
 """
 
